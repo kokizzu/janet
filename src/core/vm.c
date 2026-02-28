@@ -1127,11 +1127,11 @@ static JanetSignal run_vm(JanetFiber *fiber, Janet in) {
         }
         fiber->child = child;
         JanetSignal sig = janet_continue_no_check(child, stack[C], &retreg);
+        stack = fiber->data + fiber->frame;
         if (sig != JANET_SIGNAL_OK && !(child->flags & (1 << sig))) {
             vm_return(sig, retreg);
         }
         fiber->child = NULL;
-        stack = fiber->data + fiber->frame;
         stack[A] = retreg;
         vm_checkgc_pcnext();
     }
