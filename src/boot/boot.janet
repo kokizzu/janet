@@ -4670,7 +4670,7 @@
 
 (defn- run-main
   [env subargs arg]
-  (when-let [main (module/value env 'main)]
+  (when-let [main (module/value env 'main true)]
     (def guard (if (get env :debug) :ydt :y))
     (defn wrap-main [&]
       (main ;subargs))
