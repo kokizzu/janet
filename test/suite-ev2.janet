@@ -84,4 +84,21 @@
 (assert-error "cannot schedule non-new fiber"
               (ev/go f))
 
+# IO file copying
+(os/mkdir "tmp")
+(def f-original (file/open "tmp/out.txt" :wb))
+(xprin f-original "hello\n")
+(file/flush f-original)
+(ev/do-thread
+  # Closes a COPY of the original file, otherwise we get a user-after-close file descriptor
+  (:close f-original))
+(def g-original (file/open "tmp/out2.txt" :wb))
+(xprin g-original "world1\n")
+(xprin f-original "world2\n")
+(:close f-original)
+(xprin g-original "abc\n")
+(:close g-original)
+(assert (deep= @"hello\nworld2\n" (slurp "tmp/out.txt")) "file threading 1")
+(assert (deep= @"world1\nabc\n" (slurp "tmp/out2.txt")) "file threading 2")
+
 (end-suite)

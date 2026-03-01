@@ -1281,6 +1281,7 @@ typedef struct JanetFile JanetFile;
 struct JanetFile {
     FILE *file;
     int32_t flags;
+    size_t vbufsize;
 };
 
 /* For janet_try and janet_restore */

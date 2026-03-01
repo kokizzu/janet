@@ -4014,7 +4014,7 @@
             "handler not supported for :datagram servers")
     (def s (net/listen host port type no-reuse))
     (if handler
-      (ev/go (fn [] (net/accept-loop s handler))))
+      (ev/go (fn :net/server-handler [] (net/accept-loop s handler))))
     s))
 
 ###
@@ -4670,8 +4670,7 @@
 
 (defn- run-main
   [env subargs arg]
-  (when-let [entry (in env 'main)
-             main (or (get entry :value) (in (get entry :ref) 0))]
+  (when-let [main (module/value env 'main)]
     (def guard (if (get env :debug) :ydt :y))
     (defn wrap-main [&]
       (main ;subargs))
