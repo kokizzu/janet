@@ -43,6 +43,7 @@ static void *io_file_unmarshal(JanetMarshalContext *ctx);
 static Janet io_file_next(void *p, Janet key);
 
 #ifdef JANET_WINDOWS
+#include <io.h>
 #define ftell _ftelli64
 #define fseek _fseeki64
 #endif
