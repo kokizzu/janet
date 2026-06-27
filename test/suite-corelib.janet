@@ -207,4 +207,6 @@
            '(fn :short-fn [] (set (my-table [2 1]) (quote foo))))
         "Macro expand inside set preserves tuple type correctly")
 
+(assert-error "no infinite step range" (range 3 3 math/inf))
+
 (end-suite)

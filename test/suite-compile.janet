@@ -156,4 +156,6 @@
 (check-lint-compile '(let [outer1 "b"] outer1) "shadow local-to-global")
 (check-lint-compile '(do (def x "b") (def x "c")) "shadow local-to-local")
 
+(check-lint-compile '(def [xxx [xxx yyy]] [1 [2 3]]) "shadow global-to-global one form")
+
 (end-suite)

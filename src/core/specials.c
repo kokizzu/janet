@@ -723,10 +723,10 @@ static JanetSlot janetc_if(JanetFopts opts, int32_t argn, const Janet *argv) {
     labeld = janet_v_count(c->buffer);
     if (labeljr < labeld) {
         check_16bit_jump(c, labeljr, labelr);
-        c->buffer[labeljr] |= (labelr - labeljr) << 16;
+        c->buffer[labeljr] |= (uint32_t) (labelr - labeljr) << 16;
         if (!tail && labeljd < labeld) {
             check_24bit_jump(c, labeljd, labeld);
-            c->buffer[labeljd] |= (labeld - labeljd) << 8;
+            c->buffer[labeljd] |= (uint32_t) (labeld - labeljd) << 8;
         }
     }
 
@@ -945,8 +945,8 @@ static JanetSlot janetc_while(JanetFopts opts, int32_t argn, const Janet *argv) 
         }
         /* But now add tail recursion */
         int32_t tempself = janetc_regalloc_temp(&tempscope.ra, JANETC_REGTEMP_0);
-        janetc_emit(c, JOP_LOAD_SELF | (tempself << 8));
-        janetc_emit(c, JOP_TAILCALL | (tempself << 8));
+        janetc_emit(c, JOP_LOAD_SELF | ((uint32_t) tempself << 8));
+        janetc_emit(c, JOP_TAILCALL | ((uint32_t) tempself << 8));
         janetc_regalloc_freetemp(&c->scope->ra, tempself, JANETC_REGTEMP_0);
         /* Compile function */
         JanetFuncDef *def = janetc_pop_funcdef(c);
@@ -955,8 +955,8 @@ static JanetSlot janetc_while(JanetFopts opts, int32_t argn, const Janet *argv) 
         int32_t defindex = janetc_addfuncdef(c, def);
         /* And then load the closure and call it. */
         int32_t cloreg = janetc_regalloc_temp(&c->scope->ra, JANETC_REGTEMP_0);
-        janetc_emit(c, JOP_CLOSURE | (cloreg << 8) | (defindex << 16));
-        janetc_emit(c, JOP_CALL | (cloreg << 8) | (cloreg << 16));
+        janetc_emit(c, JOP_CLOSURE | ((uint32_t) cloreg << 8) | ((uint32_t) defindex << 16));
+        janetc_emit(c, JOP_CALL | ((uint32_t) cloreg << 8) | ((uint32_t) cloreg << 16));
         janetc_regalloc_freetemp(&c->scope->ra, cloreg, JANETC_REGTEMP_0);
         c->scope->flags |= JANET_SCOPE_CLOSURE;
         return janetc_cslot(janet_wrap_nil());
@@ -980,7 +980,7 @@ static JanetSlot janetc_while(JanetFopts opts, int32_t argn, const Janet *argv) 
     for (int32_t i = labelwt; i < labeld; i++) {
         if (c->buffer[i] == (0x80 | JOP_JUMP)) {
             check_24bit_jump(c, i, labeld);
-            c->buffer[i] = JOP_JUMP | ((labeld - i) << 8);
+            c->buffer[i] = JOP_JUMP | ((uint32_t) (labeld - i) << 8);
         }
     }
 

@@ -280,7 +280,11 @@ Shadowing janetc_shadowcheck(JanetCompiler *c, const uint8_t *sym) {
         for (int32_t i = len - 1; i >= 0; i--) {
             SymPair *pair = scope->syms + i;
             if (pair->sym == sym) {
-                janet_assert(!is_global, "shadowing analysis is incorrect. compiler bug");
+                if (is_global) {
+                    /* This can happen in a top level form like (def [x [x y]] [1 [2 3]])` where a symbol is reused in one expression */
+                    /* janet_assert(!is_global, "shadowing analysis is incorrect. compiler bug"); */
+                    return JANETC_SHADOW_GLOBAL_HIDES_GLOBAL;
+                }
                 return JANETC_SHADOW_LOCAL_HIDES_LOCAL;
             }
         }

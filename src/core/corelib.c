@@ -441,19 +441,22 @@ JANET_CORE_FN(janet_core_range,
         start = janet_getnumber(argv, 0);
         stop = janet_getnumber(argv, 1);
         step = janet_getnumber(argv, 2);
-        count = (step > 0) ? (stop - start) / step :
-                ((step < 0) ? (stop - start) / step : 0);
+        count = (step > 0.0) ? (stop - start) / step :
+                ((step < 0.0) ? (stop - start) / step : 0.0);
     } else if (argc == 2) {
-        start = janet_getnumber(argv, 0);
-        stop = janet_getnumber(argv, 1);
+        start = janet_getnumber(argv, 0.0);
+        stop = janet_getnumber(argv, 1.0);
         count = stop - start;
     } else {
-        stop = janet_getnumber(argv, 0);
+        stop = janet_getnumber(argv, 0.0);
         count = stop;
     }
-    count = (count > 0) ? count : 0;
+    if (isinf(step)) {
+        janet_panic("infinite step not allowed");
+    }
+    count = (count > 0.0) ? count : 0.0;
     int32_t int_count;
-    janet_assert(count >= 0, "bad range code");
+    janet_assert(count >= 0.0, "bad range code");
     if (count > (double) INT32_MAX) {
         janet_panicf("range is too large, %f elements", count);
     } else {
