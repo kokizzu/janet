@@ -3161,10 +3161,11 @@ static JanetEVGenericMessage janet_go_thread_subr(JanetEVGenericMessage args) {
                 janet_panicf("expected function or fiber, got %v", fiberv);
             }
             JanetFunction *func = janet_unwrap_function(fiberv);
-            fiber = janet_fiber(func, 64, func->def->min_arity ? 1 : 0, &value);
-            if (fiber == NULL) {
+            if (func->def->min_arity > 1 || func->def->min_arity < 0) {
                 janet_panicf("thread function must accept 0 or 1 arguments");
             }
+            fiber = janet_fiber(func, 64, func->def->min_arity, &value);
+            janet_assert(fiber != NULL, "bad fiber in thread setup");
             fiber->flags |=
                 JANET_FIBER_MASK_ERROR |
                 JANET_FIBER_MASK_USER0 |
@@ -3183,7 +3184,9 @@ static JanetEVGenericMessage janet_go_thread_subr(JanetEVGenericMessage args) {
         janet_schedule(fiber, value);
         janet_loop();
         args.tag = JANET_EV_TCTAG_NIL;
+        janet_restore(&tstate);
     } else {
+        janet_restore(&tstate);
         void *supervisor = janet_vm.user;
         if (NULL != supervisor) {
             /* Got a supervisor, write error there */
@@ -3209,7 +3212,6 @@ static JanetEVGenericMessage janet_go_thread_subr(JanetEVGenericMessage args) {
             }
         }
     }
-    janet_restore(&tstate);
     janet_buffer_deinit(buffer);
     janet_free(buffer);
     janet_deinit();
