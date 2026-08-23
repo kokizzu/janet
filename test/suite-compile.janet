@@ -120,6 +120,12 @@
   (def result4 (compile code (curenv) "suite-compile.janet" lints))
   (assert (and (function? result4) (empty? lints)) msg))
 
+(defn check-bad-compile
+  [code msg]
+  (def lints @[])
+  (def result4 (compile code (curenv) "suite-compile.janet" lints))
+  (assert (not (and (function? result4) (empty? lints))) msg))
+
 (defn check-lint-compile
   [code msg]
   (def lints @[])
@@ -180,5 +186,10 @@
        = = = = = = = = = =
        = = =))
 (setdyn *lint-warn* nil)
+
+# Handle bad eachp
+(check-good-compile '(eachp () 5) "good compile eachp 1")
+(check-good-compile '(do (def [] [1]) nil) "def with empty tuple binding 1")
+(check-good-compile '(do (def x (def [] [1])) x) "def with empty tuple binding 2")
 
 (end-suite)

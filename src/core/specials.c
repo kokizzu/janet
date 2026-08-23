@@ -519,8 +519,7 @@ static JanetSlot janetc_var(JanetFopts opts, int32_t argn, const Janet *argv) {
         janet_v_free(into);
         return janetc_cslot(janet_wrap_nil());
     }
-    JanetSlot ret;
-    janet_assert(janet_v_count(into) > 0, "bad destructure");
+    JanetSlot ret = janetc_cslot(janet_wrap_nil());
     for (int32_t i = 0; i < janet_v_count(into); i++) {
         destructure(c, into[i].lhs, into[i].rhs, varleaf, attr_table);
         ret = into[i].rhs;
@@ -589,8 +588,7 @@ static JanetSlot janetc_def(JanetFopts opts, int32_t argn, const Janet *argv) {
         janet_v_free(into);
         return janetc_cslot(janet_wrap_nil());
     }
-    JanetSlot ret;
-    janet_assert(janet_v_count(into) > 0, "bad destructure");
+    JanetSlot ret = janetc_cslot(janet_wrap_nil());
     for (int32_t i = 0; i < janet_v_count(into); i++) {
         destructure(c, into[i].lhs, into[i].rhs, defleaf, attr_table);
         ret = into[i].rhs;
