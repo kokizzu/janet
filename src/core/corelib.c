@@ -456,16 +456,18 @@ JANET_CORE_FN(janet_core_range,
     }
     count = (count > 0.0) ? count : 0.0;
     int32_t int_count;
-    janet_assert(count >= 0.0, "bad range code");
+    janet_assert(count >= 0.0, "bad range code (count)");
     if (count > (double) INT32_MAX) {
         janet_panicf("range is too large, %f elements", count);
     } else {
         int_count = (int32_t) ceil(count);
     }
-    if (step > 0.0) {
-        janet_assert(start + int_count * step >= stop, "bad range code");
-    } else {
-        janet_assert(start + int_count * step <= stop, "bad range code");
+    if (int_count) { /* e.g. (range 10 0 0) */
+        if (step > 0.0) {
+            janet_assert(start + int_count * step >= stop, "bad range code (+step)");
+        } else {
+            janet_assert(start + int_count * step <= stop, "bad range code (-step)");
+        }
     }
     JanetArray *array = janet_array(int_count);
     for (int32_t i = 0; i < int_count; i++) {
