@@ -150,7 +150,7 @@ static JanetSlot janetc_quasiquote(JanetFopts opts, int32_t argn, const Janet *a
         janetc_cerror(opts.compiler, "expected 1 argument to quasiquote");
         return janetc_cslot(janet_wrap_nil());
     }
-    return quasiquote(opts, argv[0], JANET_RECURSION_GUARD, 0);
+    return quasiquote(opts, argv[0], opts.compiler->recursion_guard, 0);
 }
 
 static JanetSlot janetc_unquote(JanetFopts opts, int32_t argn, const Janet *argv) {
@@ -171,6 +171,10 @@ static int destructure(JanetCompiler *c,
                                    JanetSlot s,
                                    JanetTable *attr),
                        JanetTable *attr) {
+    if (c->recursion_guard <= 0) {
+        janetc_error(c, janet_cstring("C stack recursed too deeply"));
+        return 1;
+    }
     switch (janet_type(left)) {
         default:
             janetc_error(c, janet_formatc("unexpected type in destructuring, got %v", left));
@@ -255,8 +259,10 @@ static int destructure(JanetCompiler *c,
                     JanetSlot k = janetc_cslot(janet_wrap_integer(i));
                     janetc_emit_sss(c, JOP_IN, nextright, right, k, 1);
                 }
+                c->recursion_guard--;
                 if (destructure(c, subval, nextright, leaf, attr))
                     janetc_freeslot(c, nextright);
+                c->recursion_guard++;
             }
         }
         return 1;
@@ -270,8 +276,10 @@ static int destructure(JanetCompiler *c,
                 JanetSlot nextright = janetc_farslot(c);
                 JanetSlot k = janetc_value(janetc_fopts_default(c), kvs[i].key);
                 janetc_emit_sss(c, JOP_IN, nextright, right, k, 1);
+                c->recursion_guard--;
                 if (destructure(c, kvs[i].value, nextright, leaf, attr))
                     janetc_freeslot(c, nextright);
+                c->recursion_guard++;
             }
         }
         return 1;
@@ -370,7 +378,10 @@ typedef struct SlotHeadPair {
 } SlotHeadPair;
 
 SlotHeadPair *dohead_destructure(JanetCompiler *c, SlotHeadPair *into, JanetFopts opts, Janet lhs, Janet rhs) {
-
+    if (c->recursion_guard <= 0) {
+        janetc_error(c, janet_cstring("C stack recursed too deeply"));
+        return NULL;
+    }
     /* Detect if we can do an optimization to avoid some allocations */
     int can_destructure_lhs = janet_checktype(lhs, JANET_TUPLE)
                               || janet_checktype(lhs, JANET_ARRAY);
@@ -415,7 +426,9 @@ SlotHeadPair *dohead_destructure(JanetCompiler *c, SlotHeadPair *into, JanetFopt
         if (!found_amp && !found_splice) {
             for (int32_t i = 0; i < view_lhs.len; i++) {
                 Janet sub_rhs = view_rhs.len <= i ? janet_wrap_nil() : view_rhs.items[i];
+                c->recursion_guard--;
                 into = dohead_destructure(c, into, subopts, view_lhs.items[i], sub_rhs);
+                c->recursion_guard++;
             }
             return into;
         }
