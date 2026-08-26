@@ -30,7 +30,6 @@
 #include "util.h"
 #endif
 
-
 typedef struct {
     JanetBuffer *buf;
     JanetTable seen;
@@ -79,6 +78,13 @@ enum {
     LB_TABLE_WEAKKV_PROTO, /* 231 */
     LB_ARRAY_WEAK, /* 232 */
 } LeadBytes;
+
+/* Avoid overflow and underflow, especially on 32-bit systems */
+static void *array_allocate(size_t element_size, int32_t count) {
+    if (count < 0) return NULL;
+    if ((size_t) count > (SIZE_MAX / element_size)) return NULL;
+    return janet_malloc(element_size * count);
+}
 
 /* Helper to look inside an entry in an environment */
 static Janet entry_getval(Janet env_entry) {
@@ -862,7 +868,7 @@ static const uint8_t *unmarshal_one_env(
             if (length == 0) {
                 janet_panic("invalid funcenv length");
             }
-            env->as.values = janet_malloc(sizeof(Janet) * (size_t) length);
+            env->as.values = array_allocate(sizeof(Janet), length);
             if (!env->as.values) {
                 JANET_OUT_OF_MEMORY;
             }
@@ -966,7 +972,7 @@ static const uint8_t *unmarshal_one_def(
 
         /* Unmarshal constants */
         if (constants_length) {
-            def->constants = janet_malloc(sizeof(Janet) * constants_length);
+            def->constants = array_allocate(sizeof(Janet), constants_length);
             if (!def->constants) {
                 JANET_OUT_OF_MEMORY;
             }
@@ -979,8 +985,7 @@ static const uint8_t *unmarshal_one_def(
 
         /* Unmarshal symbol map, if needed */
         if (def->flags & JANET_FUNCDEF_FLAG_HASSYMBOLMAP) {
-            size_t size = sizeof(JanetSymbolMap) * symbolmap_length;
-            def->symbolmap = janet_malloc(size);
+            def->symbolmap = array_allocate(sizeof(JanetSymbolMap), symbolmap_length);
             if (def->symbolmap == NULL) {
                 JANET_OUT_OF_MEMORY;
             }
@@ -999,7 +1004,7 @@ static const uint8_t *unmarshal_one_def(
         }
 
         /* Unmarshal bytecode */
-        def->bytecode = janet_malloc(sizeof(uint32_t) * bytecode_length);
+        def->bytecode = array_allocate(sizeof(uint32_t), bytecode_length);
         if (!def->bytecode) {
             JANET_OUT_OF_MEMORY;
         }
@@ -1037,7 +1042,7 @@ static const uint8_t *unmarshal_one_def(
         /* Unmarshal source maps if needed */
         if (def->flags & JANET_FUNCDEF_FLAG_HASSOURCEMAP) {
             int32_t current = 0;
-            def->sourcemap = janet_malloc(sizeof(JanetSourceMapping) * (size_t) bytecode_length);
+            def->sourcemap = array_allocate(sizeof(JanetSourceMapping), bytecode_length);
             if (!def->sourcemap) {
                 JANET_OUT_OF_MEMORY;
             }
@@ -1053,7 +1058,7 @@ static const uint8_t *unmarshal_one_def(
         /* Unmarshal closure bitset if needed */
         if (def->flags & JANET_FUNCDEF_FLAG_HASCLOBITSET) {
             int32_t n = (def->slotcount + 31) >> 5;
-            def->closure_bitset = janet_malloc(sizeof(uint32_t) * (size_t) n);
+            def->closure_bitset = array_allocate(sizeof(uint32_t), n);
             if (NULL == def->closure_bitset) {
                 JANET_OUT_OF_MEMORY;
             }
@@ -1122,7 +1127,7 @@ static const uint8_t *unmarshal_one_fiber(
         /* Extra capacity is usually nice to avoid immediately reallocing on pushed arguments, but not needed */
         fiber->capacity = INT32_MAX;
     }
-    fiber->data = janet_malloc(sizeof(Janet) * fiber->capacity);
+    fiber->data = array_allocate(sizeof(Janet), fiber->capacity);
     if (!fiber->data) {
         JANET_OUT_OF_MEMORY;
     }
