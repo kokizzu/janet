@@ -3076,6 +3076,7 @@ JANET_CORE_FN(cfun_ev_go,
             janet_panicf("task function must accept 0 or 1 arguments");
         }
         fiber = janet_fiber(func, 64, func->def->min_arity, &value);
+        janet_assert(fiber != NULL, "bad fiber-func");
         fiber->flags |=
             JANET_FIBER_MASK_ERROR |
             JANET_FIBER_MASK_USER0 |

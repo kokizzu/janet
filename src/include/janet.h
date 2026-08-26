@@ -2042,6 +2042,7 @@ JANET_API void janet_stacktrace_ext(JanetFiber *fiber, Janet err, const char *pr
 #define JANET_SANDBOX_THREADS 131072
 #define JANET_SANDBOX_UNMARSHAL 262144
 #define JANET_SANDBOX_EXIT 524288
+#define JANET_SANDBOX_LOCALE 1048576
 #define JANET_SANDBOX_ALL (UINT32_MAX)
 JANET_API void janet_sandbox(uint32_t flags);
 JANET_API void janet_sandbox_assert(uint32_t forbidden_flags);

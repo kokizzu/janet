@@ -914,6 +914,7 @@ JANET_CORE_FN(cfun_filewatch_add,
               "* `:renamed-new`\n\n"
               "On Linux and BSDs, events will have a `:type` corresponding to the possible flags, excluding `:all`.\n"
               "") {
+    janet_sandbox_assert(JANET_SANDBOX_FS_READ);
     janet_arity(argc, 2, -1);
     JanetWatcher *watcher = janet_getabstract(argv, 0, &janet_filewatch_at);
     const char *path = janet_getcstring(argv, 1);

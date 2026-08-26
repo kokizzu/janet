@@ -770,6 +770,7 @@ static const SandboxOption sandbox_options[] = {
     {"fs-temp", JANET_SANDBOX_FS_TEMP},
     {"fs-write", JANET_SANDBOX_FS_WRITE},
     {"hrtime", JANET_SANDBOX_HRTIME},
+    {"locale", JANET_SANDBOX_LOCALE},
     {"modules", JANET_SANDBOX_DYNAMIC_MODULES},
     {"net", JANET_SANDBOX_NET},
     {"net-connect", JANET_SANDBOX_NET_CONNECT},
@@ -801,6 +802,7 @@ JANET_CORE_FN(janet_core_sandbox,
               "* :fs-temp - disallow creating temporary files\n"
               "* :fs-write - disallow write access to the file system\n"
               "* :hrtime - disallow high-resolution timers\n"
+              "* :locale - disallow `os/setlocale`\n"
               "* :modules - disallow load dynamic modules (natives)\n"
               "* :net - disallow network access\n"
               "* :net-connect - disallow making outbound network connections\n"

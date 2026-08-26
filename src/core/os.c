@@ -2097,6 +2097,7 @@ JANET_CORE_FN(os_setlocale,
               " * :time\n\n"
               "Returns the new locale if set successfully, otherwise nil. Note that this will affect "
               "other functions such as `os/strftime` and even `printf`.") {
+    janet_sandbox_assert(JANET_SANDBOX_LOCALE);
     janet_arity(argc, 0, 2);
     const char *locale_name = janet_optcstring(argv, argc, 0, NULL);
     int category_int = LC_ALL;
@@ -2202,7 +2203,7 @@ JANET_CORE_FN(os_rmdir,
 JANET_CORE_FN(os_cd,
               "(os/cd path)",
               "Change current directory to path. Returns nil on success, errors on failure.") {
-    janet_sandbox_assert(JANET_SANDBOX_FS_READ);
+    janet_sandbox_assert(JANET_SANDBOX_FS_READ | JANET_SANDBOX_FS_WRITE);
     janet_fixarity(argc, 1);
     const char *path = janet_getcstring(argv, 0);
 #ifdef JANET_WINDOWS
@@ -2241,6 +2242,7 @@ JANET_CORE_FN(os_touch,
 JANET_CORE_FN(os_remove,
               "(os/rm path)",
               "Delete a file. Returns nil.") {
+    janet_sandbox_assert(JANET_SANDBOX_FS_WRITE);
     janet_fixarity(argc, 1);
     const char *path = janet_getcstring(argv, 0);
     int status = remove(path);
@@ -2252,6 +2254,7 @@ JANET_CORE_FN(os_remove,
 JANET_CORE_FN(os_readlink,
               "(os/readlink path)",
               "Read the contents of a symbolic link. Does not work on Windows.\n") {
+    janet_sandbox_assert(JANET_SANDBOX_FS_READ);
     janet_fixarity(argc, 1);
 #ifdef JANET_WINDOWS
     (void) argc;
@@ -2931,6 +2934,7 @@ JANET_CORE_FN(os_pipe,
               "* :R - sets the readable end of the pipe to a blocking stream.\n\n"
               "By default, both ends of the pipe are non-blocking for use with the `ev` module.") {
     (void) argv;
+    janet_sandbox_assert(JANET_SANDBOX_FS_WRITE | JANET_SANDBOX_FS_TEMP);
     janet_arity(argc, 0, 1);
     JanetHandle fds[2];
     int flags = 0;
@@ -3001,8 +3005,6 @@ void janet_lib_os(JanetTable *env) {
         JANET_CORE_REG("os/dir", os_dir),
         JANET_CORE_REG("os/stat", os_stat),
         JANET_CORE_REG("os/lstat", os_lstat),
-        JANET_CORE_REG("os/chmod", os_chmod),
-        JANET_CORE_REG("os/touch", os_touch),
         JANET_CORE_REG("os/realpath", os_realpath),
         JANET_CORE_REG("os/cd", os_cd),
 #ifndef JANET_NO_UMASK
@@ -3018,6 +3020,8 @@ void janet_lib_os(JanetTable *env) {
         JANET_CORE_REG("os/rm", os_remove),
         JANET_CORE_REG("os/link", os_link),
         JANET_CORE_REG("os/rename", os_rename),
+        JANET_CORE_REG("os/chmod", os_chmod),
+        JANET_CORE_REG("os/touch", os_touch),
 #ifndef JANET_NO_SYMLINKS
         JANET_CORE_REG("os/symlink", os_symlink),
 #endif

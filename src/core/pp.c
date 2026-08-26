@@ -720,7 +720,7 @@ static void janet_pretty_one(struct pretty *S, Janet x) {
 
                 /* Shortcut for huge dictionaries, don't bother sorting keys */
                 if (len > JANET_PRETTY_DICT_KEYSORT_LIMIT) {
-                    if (!(S->flags & JANET_PRETTY_NOTRUNC) && (len > JANET_PRETTY_DICT_LIMIT)) {
+                    if (!(S->flags & JANET_PRETTY_NOTRUNC)) {
                         len = JANET_PRETTY_DICT_LIMIT;
                         truncated = 1;
                     }
