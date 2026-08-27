@@ -1213,3 +1213,10 @@ void *(janet_calloc)(size_t nmemb, size_t size) {
 void *(janet_realloc)(void *ptr, size_t size) {
     return janet_realloc(ptr, size);
 }
+
+/* Avoid overflow and underflow, especially on 32-bit systems */
+void *array_allocate(size_t element_size, int32_t count) {
+    if (count < 0) return NULL;
+    if ((size_t) count > (SIZE_MAX / element_size)) return NULL;
+    return janet_malloc(element_size * count);
+}

@@ -260,7 +260,7 @@ JanetTable *janet_table_clone(JanetTable *table) {
     newTable->capacity = table->capacity;
     newTable->deleted = table->deleted;
     newTable->proto = table->proto;
-    newTable->data = janet_malloc(newTable->capacity * sizeof(JanetKV));
+    newTable->data = array_allocate(sizeof(JanetKV), newTable->capacity);
     if (NULL == newTable->data) {
         JANET_OUT_OF_MEMORY;
     }

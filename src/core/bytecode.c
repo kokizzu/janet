@@ -408,6 +408,7 @@ int janet_verify(JanetFuncDef *def) {
     int32_t maxslot = def->arity + vargs;
     int32_t sc = def->slotcount;
 
+    if (def->environments_length > 256) return 15;
     if (def->bytecode_length == 0) return 1;
 
     if (maxslot > sc) return 2;

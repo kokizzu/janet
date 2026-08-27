@@ -79,13 +79,6 @@ enum {
     LB_ARRAY_WEAK, /* 232 */
 } LeadBytes;
 
-/* Avoid overflow and underflow, especially on 32-bit systems */
-static void *array_allocate(size_t element_size, int32_t count) {
-    if (count < 0) return NULL;
-    if ((size_t) count > (SIZE_MAX / element_size)) return NULL;
-    return janet_malloc(element_size * count);
-}
-
 /* Helper to look inside an entry in an environment */
 static Janet entry_getval(Janet env_entry) {
     if (janet_checktype(env_entry, JANET_TABLE)) {

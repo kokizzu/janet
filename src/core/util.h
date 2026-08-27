@@ -172,6 +172,9 @@ int janet_gettime(struct timespec *spec, enum JanetTimeSource source);
 #define strdup(x) _strdup(x)
 #endif
 
+/* Safely allocate arrays */
+void *array_allocate(size_t element_size, int32_t count);
+
 /* Use LoadLibrary on windows or dlopen on posix to load dynamic libraries
  * with native code. */
 #if defined(JANET_NO_DYNAMIC_MODULES)
