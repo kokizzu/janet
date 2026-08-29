@@ -2837,15 +2837,19 @@ JANET_CORE_FN(os_open,
             break;
         case OCREAT:
             creationDisp = OPEN_ALWAYS;
+            janet_sandbox_assert(JANET_SANDBOX_FS_WRITE | JANET_SANDBOX_FS_READ);
             break;
         case OCREAT + OEXCL:
             creationDisp = CREATE_NEW;
+            janet_sandbox_assert(JANET_SANDBOX_FS_WRITE);
             break;
         case OCREAT + OTRUNC:
             creationDisp = CREATE_ALWAYS;
+            janet_sandbox_assert(JANET_SANDBOX_FS_WRITE);
             break;
         case OTRUNC:
             creationDisp = TRUNCATE_EXISTING;
+            janet_sandbox_assert(JANET_SANDBOX_FS_WRITE);
             break;
     }
     if (fileAttributes == 0) {
@@ -2900,6 +2904,7 @@ JANET_CORE_FN(os_open,
                 break;
             case 'a':
                 open_flags |= O_APPEND;
+                janet_sandbox_assert(JANET_SANDBOX_FS_WRITE);
                 break;
             case 'N':
                 open_flags &= ~O_NONBLOCK;
@@ -2910,10 +2915,13 @@ JANET_CORE_FN(os_open,
     /* If both read and write, fix up to O_RDWR */
     if (read_flag && !write_flag) {
         open_flags |= O_RDONLY;
+        janet_sandbox_assert(JANET_SANDBOX_FS_READ);
     } else if (write_flag && !read_flag) {
         open_flags |= O_WRONLY;
+        janet_sandbox_assert(JANET_SANDBOX_FS_WRITE);
     } else {
         open_flags |= O_RDWR;
+        janet_sandbox_assert(JANET_SANDBOX_FS_WRITE | JANET_SANDBOX_FS_READ);
     }
 
     do {
