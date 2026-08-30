@@ -623,4 +623,7 @@
 (assert (not (string/has-prefix? "cannot cancel" msg)) "os/spawn :x 2")
 (assert (string/has-prefix? "command failed" msg) "os/spawn :x 3")
 
+# OS shell
+(assert (= 0 (os/shell [run "-e" "(os/exit 0)"])) "os/shell simple")
+
 (end-suite)
