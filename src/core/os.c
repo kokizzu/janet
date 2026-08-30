@@ -1636,7 +1636,8 @@ static JanetEVGenericMessage os_shell_subr(JanetEVGenericMessage args) {
 
 JANET_CORE_FN(os_shell,
               "(os/shell str)",
-              "Pass a command string str directly to the system shell.") {
+              "Pass a command string `str` directly to the system shell. Prefer `os/execute` "
+              "in most cases.") {
     janet_sandbox_assert(JANET_SANDBOX_SUBPROCESS);
     janet_arity(argc, 0, 1);
     const char *cmd = argc
