@@ -624,6 +624,11 @@
 (assert (string/has-prefix? "command failed" msg) "os/spawn :x 3")
 
 # OS shell
-(assert (= 0 (os/shell [run "-e" "(os/exit 0)"])) "os/shell simple")
+(defn- shell-quote
+  [x]
+  (if (index-of (os/which) [:mingw :windows])
+    (string `"` x `"`)
+    (string "'" x "'")))
+(assert (= 0 (os/shell (string/join [;run janet "-e" (shell-quote "(os/exit 0)")] " "))) "os/shell simple")
 
 (end-suite)
