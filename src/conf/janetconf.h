@@ -4,10 +4,10 @@
 #define JANETCONF_H
 
 #define JANET_VERSION_MAJOR 1
-#define JANET_VERSION_MINOR 41
-#define JANET_VERSION_PATCH 3
+#define JANET_VERSION_MINOR 42
+#define JANET_VERSION_PATCH 0
 #define JANET_VERSION_EXTRA "-dev"
-#define JANET_VERSION "1.41.3-dev"
+#define JANET_VERSION "1.42.0-dev"
 
 /* #define JANET_BUILD "local" */
 

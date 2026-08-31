@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## Unreleased - ???
+## 1.42.0 - ???
 - Add `:locale` option to `sandbox` to mask calling `os/setlocale`.
 - JANET_PATH will now be searched strictly left-to-right for modules.
 - Add `-t` (`--tool`) flag for using installed libraries as command line tools
