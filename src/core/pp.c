@@ -629,7 +629,7 @@ static void janet_pretty_one(struct pretty *S, Janet x) {
             const char *startstr = isarray ? "@[" : hasbrackets ? "[" : "(";
             const char endchar = isarray ? ']' : hasbrackets ? ']' : ')';
             janet_buffer_push_cstring(S->buffer, startstr);
-            S->align += strlen(startstr);
+            S->align += (int32_t) strlen(startstr);
             const int align = S->leaf_align = S->align;
             S->depth--;
             if (S->depth == 0) {
