@@ -444,11 +444,11 @@ JANET_CORE_FN(janet_core_range,
         count = (step > 0.0) ? (stop - start) / step :
                 ((step < 0.0) ? (stop - start) / step : 0.0);
     } else if (argc == 2) {
-        start = janet_getnumber(argv, 0.0);
-        stop = janet_getnumber(argv, 1.0);
+        start = janet_getnumber(argv, 0);
+        stop = janet_getnumber(argv, 1);
         count = stop - start;
     } else {
-        stop = janet_getnumber(argv, 0.0);
+        stop = janet_getnumber(argv, 0);
         count = stop;
     }
     if (isinf(step)) {

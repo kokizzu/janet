@@ -351,7 +351,7 @@ int8_t janet_getinteger8(const Janet *argv, int32_t n) {
     if (!janet_checkint8(x)) {
         janet_panicf("bad slot #%d, expected 8 bit signed integer, got %v", n, x);
     }
-    return (int16_t) janet_unwrap_number(x);
+    return (int8_t) janet_unwrap_number(x);
 }
 
 uint8_t janet_getuinteger8(const Janet *argv, int32_t n) {
@@ -359,7 +359,7 @@ uint8_t janet_getuinteger8(const Janet *argv, int32_t n) {
     if (!janet_checkuint8(x)) {
         janet_panicf("bad slot #%d, expected 8 bit unsigned integer, got %v", n, x);
     }
-    return (uint16_t) janet_unwrap_number(x);
+    return (uint8_t) janet_unwrap_number(x);
 }
 
 int64_t janet_getinteger64(const Janet *argv, int32_t n) {
