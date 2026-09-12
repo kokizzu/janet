@@ -301,7 +301,11 @@ JANET_NO_RETURN static void janet_sched_accept(JanetStream *stream, JanetFunctio
 
 static int net_sched_accept_impl(NetStateAccept *state, JanetFiber *fiber, Janet *err) {
     SOCKET lsock = (SOCKET) state->lstream->handle;
+#ifdef JANET_NO_IPV6
     SOCKET asock = WSASocketW(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED);
+#else
+    SOCKET asock = WSASocketW(AF_INET6, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED);
+#endif
     if (asock == INVALID_SOCKET) {
         *err = janet_ev_lasterr();
         return 1;
