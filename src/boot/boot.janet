@@ -4309,8 +4309,12 @@
     (assert (not (and (= cntype :datagram) handler))
             "handler not supported for :datagram servers")
     (def s (net/listen host port cntype no-reuse))
-    (if handler
-      (ev/go (fn :net/server-handler [] (net/accept-loop s handler))))
+    (when handler
+      (ev/go (fn :net/server-handler [] (net/accept-loop s handler)))
+      # Ensure accept-loop has started before returning. Not completely needed, but avoids
+      # the possibility of closing `s` before `net/accept-loop` runs
+      # and getting an annoying error print from `:net/server-handler`
+      (ev/sleep 0))
     s))
 
 ###

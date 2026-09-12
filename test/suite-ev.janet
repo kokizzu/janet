@@ -489,7 +489,7 @@
 (defn level-trigger-handling [conn &] (:close conn))
 (def s (assert (net/server test-host test-port level-trigger-handling)))
 (def c (assert (net/connect test-host test-port)))
-(:close s)
+(:close s) # closing s before net/server's accept loop starts.
 
 # Issue #1531 no. 2
 (def c (ev/chan 0))
